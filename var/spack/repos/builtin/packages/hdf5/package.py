@@ -359,3 +359,43 @@ HDF5 version {version} {version}
                 print('-' * 80)
                 raise RuntimeError("HDF5 install check failed")
         shutil.rmtree(checkdir)
+
+    def _test_check_versions(self):
+        """Perform version checks on selected installed package binaries."""
+        spec_vers_str = 'Version {0}'.format(self.spec.version)
+        spec_mm = str(self.spec.version.up_to(2))
+
+        checks = {
+            'gif2h5': ([spec_vers_str], None),
+            'h52gif':  ([spec_vers_str], None),
+            'h5clear':  ([spec_vers_str], None),
+            'h5copy':  ([spec_vers_str], None),
+            'h5diff':  ([spec_vers_str], None),
+            'h5dump':  ([spec_vers_str], None),
+            'h5format_convert':  ([spec_vers_str], None),
+            'h5import':  ([spec_vers_str], None),
+            'h5jam':  ([spec_vers_str], None),
+            'h5ls':  ([spec_vers_str], None),
+            'h5mkgrp':  ([spec_vers_str], None),
+            'h5perf':  ([spec_vers_str], None),
+            'h5perf_serial':  ([spec_vers_str], None),
+            'h5redeploy':  (['Unknown Option'], None),
+            'h5repack':  ([spec_vers_str], None),
+            'h5repart':  ([spec_mm], None),
+            'h5stat':  ([spec_vers_str], None),
+            'h5unjam':  ([spec_vers_str], None),
+        }
+
+        for exe in checks:
+            expected, status = checks[exe]
+            reason = 'test version of {0} is {1}'.format(exe, expected[0])
+            self.run_test(exe, ['--version'], expected, status, installed=True,
+                          purpose=reason, skip_missing=True)
+
+    def test(self):
+        """Perform smoke tests on the installed package."""
+        # Simple version check tests on known binaries
+        self._test_check_versions()
+
+        # Run existing install check
+        self.check_install()
